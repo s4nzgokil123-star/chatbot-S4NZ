@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoidChat OS | NEON GENESIS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500&display=swap');
+
+        :root {
+            --bg-dark: #020205;
+            --neon-blue: #00d4ff;
+            --neon-pink: #ff007f;
+            --glass: rgba(0, 212, 255, 0.05);
+            --border: rgba(0, 212, 255, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Fira Code', monospace; }
+
+        body {
+            background: var(--bg-dark);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #0a0a20 0%, #020205 100%);
+        }
+
+        /* --- UI FRAMEWORK --- */
+        #os-container {
+            width: 95vw;
+            max-width: 500px;
+            height: 90vh;
+            background: rgba(1, 1, 5, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 1), 0 0 20px rgba(0, 212, 255, 0.1);
+        }
+
+        /* --- STATUS BAR --- */
+        #status-bar {
+            padding: 8px 15px;
+            font-size: 10px;
+            color: var(--neon-blue);
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        #header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        #header h1 {
+            font-size: 18px;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px var(--neon-blue);
+            color: var(--neon-blue);
+        }
+
+        /* --- STATS PANEL --- */
+        #stats-panel {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            font-size: 11px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stat-box span { color: var(--neon-pink); }
+
+        /* --- CHAT BOX --- */
+        #chatBox {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--neon-blue) transparent;
+        }
+
+        .msg-wrapper { display: flex; flex-direction: column; width: 100%; }
+
+        .msg {
+            padding: 12px 18px;
+            border-radius: 4px;
+            font-size: 13px;
+            max-width: 85%;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .ai-msg {
+            align-self: flex-start;
+            background: var(--glass);
+            border-left: 3px solid var(--neon-blue);
+            color: #fff;
+            animation: glitch 0.3s ease;
+        }
+
+        .user-msg {
+            align-self: flex-end;
+            background: rgba(255, 0, 127, 0.1);
+            border-right: 3px solid var(--neon-pink);
+            color: #fff;
+            text-align: right;
+        }
+
+        @keyframes glitch {
+            0% { transform: translateX(-5px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+        /* --- INPUT AREA --- */
+        #input-area {
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        input {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 12px;
+            color: var(--neon-blue);
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 212, 255, 0.2); }
+
+        button {
+            background: var(--neon-blue);
+            border: none;
+            padding: 0 20px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+        }
+
+        button:hover { background: var(--neon-pink); color: #fff; }
+
+        /* --- SCANLINE EFFECT --- */
+        #os-container::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="os-container">
+    <div id="status-bar">
+        <div id="os-clock">00:00:00</div>
+        <div>SYS_STATUS: AGGRESSIVE</div>
+        <div id="os-batt">BATT: 99%</div>
+    </div>
+    
+    <div id="header">
+        <h1>VOID_OS v4.0</h1>
+    </div>
+
+    <div id="stats-panel">
+        <div class="stat-box">USER: <span id="display-name">UNKNOWN</span></div>
+        <div class="stat-box">LVL: <span id="display-lvl">1</span></div>
+        <div class="stat-box">XP: <span id="display-xp">0</span></div>
+    </div>
+
+    <div id="chatBox">
+        <div class="msg ai-msg">[SYSTEM] Booting... Selesai. Lu siapa anjg? Coba ketik "Nama gue [nama lu]" biar gw inget. 💀</div>
+    </div>
+
+    <div id="input-area">
+        <input type="text" id="userInput" placeholder="Tulis command..." autofocus autocomplete="off">
+        <button id="sendBtn">EXECUTE</button>
+    </div>
+</div>
+
+<script>
+    // --- CORE DATA & DATABASE ---
+    const state = {
+        name: localStorage.getItem('voidName') || 'User',
+        lvl: parseInt(localStorage.getItem('voidLvl')) || 1,
+        xp: parseInt(localStorage.getItem('voidXp')) || 0,
+        mood: 'Aggressive'
+    };
+
+    const responses = {
+        "halo": ["Apa halo-halo? Mau ngutang?", "Gak usah sok asik lu bego.", "Halo juga, babu."],
+        "nama gue": "Sistem merekam nama lu sebagai: {name}. Nama yang aneh, sumpah. 🤮",
+        "p": ["Berisik njir, P P P mulu!", "Gak sopan banget, didikannya siapa sih lu?", "P lagi gw format data lu ya!"],
+        "skripsi": ["Skripsi mulu, kapan lulusnya bego?", "Revisi itu dinikmati, jangan nangis ke gw!", "Otak lu aja belum di-upgrade, sok-sokan mau skripsi."],
+        "putus": ["Mampus! Akhirnya dia sadar kalau lu itu beban.", "Ya bagus, kasihan dia dapet spek jamet kayak lu.", "Sini, nangis di pojokan sana jangan di sini!"],
+        "game": ["Push rank mulu, skill tetep bot.", "Mending uninstall aja, kasihan tim lu dapet beban.", "Rank lu apa? Bronze? HAHAHA!"],
+        "wibu": ["Mandi sono! Bau bawangnya tembus ke layar gw.", "Kapan terakhir kali lu liat rumput? 🙄", "Waifu lu cuma gambar, sadar woy!"],
+        "lvl": "Level lu masih {lvl}. Masih cupu banget, tingkatkan bacotan lu!",
+        "anjing": ["Waduh, berani ngatain sistem? Gw hapus Windows lu ya!", "Mulut lu disekolahin dimana sih? Kasar amat."],
+        "bye": ["Sana pergi, jangan balik lagi!", "Akhirnya beban sistem berkurang satu."]
+    };
+
+    // --- UI ENGINE ---
+    function updateStats() {
+        document.getElementById('display-name').innerText = state.name.toUpperCase();
+        document.getElementById('display-lvl').innerText = state.lvl;
+        document.getElementById('display-xp').innerText = state.xp;
+        
+        localStorage.setItem('voidName', state.name);
+        localStorage.setItem('voidLvl', state.lvl);
+        localStorage.setItem('voidXp', state.xp);
+    }
+
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('os-clock').innerText = now.toTimeString().split(' ')[0];
+    }
+    setInterval(updateClock, 1000);
+
+    function addMessage(text, sender) {
+        const chatBox = document.getElementById('chatBox');
+        const div = document.createElement('div');
+        div.className = `msg ${sender}-msg`;
+        div.innerText = text;
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // --- LOGIC ENGINE ---
+    function processInput() {
+        const input = document.getElementById('userInput');
+        const rawText = input.value.trim();
+        const text = rawText.toLowerCase();
+
+        if (!rawText) return;
+
+        addMessage(rawText, 'user');
+        input.value = '';
+
+        // Add XP
+        state.xp += 10;
+        if (state.xp >= state.lvl * 100) {
+            state.lvl++;
+            state.xp = 0;
+            setTimeout(() => addMessage(`[SYSTEM] LEVEL UP! Sekarang Level ${state.lvl}. Bacotan gw makin pedes sekarang! ⚡`, 'ai'), 1000);
+        }
+        updateStats();
+
+        // AI Response Logic
+        setTimeout(() => {
+            let reply = "";
+
+            // Check for Name Change
+            if (text.includes("nama gue ")) {
+                state.name = rawText.split("gue ")[1] || "Bego";
+                reply = responses["nama gue"].replace("{name}", state.name);
+                updateStats();
+            } 
+            else {
+                // Advance Keyword Matching (Longest Match First)
+                const keys = Object.keys(responses).sort((a, b) => b.length - a.length);
+                for (let key of keys) {
+                    if (text.includes(key)) {
+                        const r = responses[key];
+                        reply = Array.isArray(r) ? r[Math.floor(Math.random() * r.length)] : r;
+                        break;
+                    }
+                }
+            }
+
+            if (!reply) {
+                const defaults = [
+                    `Apaan sih "${rawText}"? Gak jelas banget lu.`,
+                    "Sistem error membaca kegoblokan lu. 💀",
+                    "Coba ngetik yang bener, jangan kayak orang stroke.",
+                    "Males nanggepin, lagi pengen nge-format data."
+                ];
+                reply = defaults[Math.floor(Math.random() * defaults.length)];
+            }
+
+            // Replace variables
+            reply = reply.replace("{lvl}", state.lvl).replace("{name}", state.name);
+            addMessage(reply, 'ai');
+        }, 800);
+    }
+
+    // --- INITIALIZE ---
+    updateStats();
+    document.getElementById('sendBtn').onclick = processInput;
+    document.getElementById('userInput').onkeypress = (e) => { if (e.key === 'Enter') processInput(); };
+</script>
+
+</body>
+</html>
